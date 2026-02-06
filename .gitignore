@@ -1,0 +1,14 @@
+﻿.env
+.env.local
+.env.production
+node_modules/
+*/node_modules/
+dist/
+build/
+client/dist/
+*.log
+npm-debug.log*
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
