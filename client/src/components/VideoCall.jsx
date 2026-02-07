@@ -17,7 +17,6 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
   const userVideo = useRef();
   const peerConnection = useRef(null);
 
-  // ICE servers for WebRTC
   const iceServers = {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
@@ -27,7 +26,6 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
   };
 
   useEffect(() => {
-    // Get user media
     navigator.mediaDevices
       .getUserMedia({ video: isVideoCall, audio: true })
       .then((currentStream) => {
@@ -55,25 +53,22 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
   useEffect(() => {
     if (!socket) return;
 
-    // Listen for incoming call
     socket.on('webrtc-offer', async ({ from, offer, callerName }) => {
-      console.log('📲 Received call from:', callerName);
+      console.log(' Received call from:', callerName);
       setReceivingCall(true);
       setCaller({ id: from, name: callerName, offer });
     });
 
-    // Listen for answer
     socket.on('webrtc-answer', async ({ answer }) => {
-      console.log('✅ Call answered');
+      console.log(' Call answered');
       if (peerConnection.current) {
         await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
         setCallAccepted(true);
       }
     });
 
-    // Listen for ICE candidates
     socket.on('webrtc-ice-candidate', async ({ candidate }) => {
-      console.log('🧊 Received ICE candidate');
+      console.log(' Received ICE candidate');
       if (peerConnection.current && candidate) {
         try {
           await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
@@ -83,16 +78,14 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
       }
     });
 
-    // Call rejected
     socket.on('call-rejected', () => {
-      console.log('❌ Call rejected');
+      console.log(' Call rejected');
       alert('Call was rejected');
       handleEndCall();
     });
 
-    // Call ended
     socket.on('call-ended', () => {
-      console.log('📴 Call ended');
+      console.log(' Call ended');
       handleEndCall();
     });
 
@@ -105,21 +98,18 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
     };
   }, [socket]);
 
-  // Create peer connection
   const createPeerConnection = () => {
     const pc = new RTCPeerConnection(iceServers);
 
-    // Add local stream tracks individually
     if (stream) {
       stream.getTracks().forEach(track => {
-        console.log('➕ Adding local track:', track.kind);
+        console.log(' Adding local track:', track.kind);
         pc.addTrack(track, stream);
       });
     }
 
-    // Handle remote stream - CRITICAL FIX
     pc.ontrack = (event) => {
-      console.log('📺 ontrack event fired!');
+      console.log('  ontrack event fired!');
       console.log('   Track kind:', event.track.kind);
       console.log('   Track id:', event.track.id);
       console.log('   Streams count:', event.streams.length);
@@ -130,23 +120,20 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
         console.log('   Remote tracks:', remoteStream.getTracks().length);
         
         if (userVideo.current) {
-          console.log('✅ Setting remote stream to video element');
+          console.log(' Setting remote stream to video element');
           userVideo.current.srcObject = remoteStream;
           
-          // Ensure video plays
           userVideo.current.play()
-            .then(() => console.log('✅ Remote video playing'))
-            .catch(err => console.error('❌ Remote video play failed:', err));
+            .then(() => console.log(' Remote video playing'))
+            .catch(err => console.error(' Remote video play failed:', err));
         } else {
-          console.error('❌ userVideo ref is null!');
+          console.error(' userVideo ref is null!');
         }
         
-        // Set call as accepted when we receive tracks
         setCallAccepted(true);
       }
     };
 
-    // Handle ICE candidates
     pc.onicecandidate = (event) => {
       if (event.candidate && socket) {
         console.log('🧊 Sending ICE candidate');
@@ -157,27 +144,24 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
       }
     };
 
-    // Connection state changes
     pc.onconnectionstatechange = () => {
-      console.log('🔌 Connection state:', pc.connectionState);
+      console.log(' Connection state:', pc.connectionState);
       if (pc.connectionState === 'connected') {
-        console.log('✅ Peer connection established!');
+        console.log(' Peer connection established!');
         setCallAccepted(true);
       } else if (pc.connectionState === 'failed') {
-        console.error('❌ Peer connection failed');
+        console.error(' Peer connection failed');
         alert('Connection failed. Please try again.');
         handleEndCall();
       } else if (pc.connectionState === 'disconnected') {
-        console.log('⚠️ Peer disconnected');
+        console.log(' Peer disconnected');
       }
     };
 
-    // ICE connection state
     pc.oniceconnectionstatechange = () => {
       console.log('🧊 ICE connection state:', pc.iceConnectionState);
     };
 
-    // Signaling state
     pc.onsignalingstatechange = () => {
       console.log('📡 Signaling state:', pc.signalingState);
     };
@@ -185,31 +169,29 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
     return pc;
   };
 
-  // Call user
   const callUser = async () => {
     if (!stream || !socket) {
-      console.error('❌ Stream or socket not ready');
+      console.error(' Stream or socket not ready');
       return;
     }
 
-    console.log('📞 Initiating call to:', receiver.name);
-    console.log('📞 Receiver ID:', receiver._id);
-    console.log('📞 My ID:', user._id);
+    console.log(' Initiating call to:', receiver.name);
+    console.log(' Receiver ID:', receiver._id);
+    console.log(' My ID:', user._id);
     
     peerConnection.current = createPeerConnection();
 
     try {
-      // Create offer with specific options
       const offer = await peerConnection.current.createOffer({
         offerToReceiveAudio: true,
         offerToReceiveVideo: isVideoCall
       });
       
-      console.log('📄 Created offer:', offer.type);
+      console.log(' Created offer:', offer.type);
       await peerConnection.current.setLocalDescription(offer);
-      console.log('✅ Set local description');
+      console.log(' Set local description');
 
-      console.log('📡 Sending offer to:', receiver._id);
+      console.log(' Sending offer to:', receiver._id);
       socket.emit('webrtc-offer', {
         to: receiver._id,
         offer,
@@ -217,16 +199,16 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
         callerName: user.name
       });
     } catch (error) {
-      console.error('❌ Error creating offer:', error);
+      console.error(' Error creating offer:', error);
       alert('Failed to initiate call: ' + error.message);
       handleEndCall();
     }
   };
 
-  // Answer call
+  
   const answerCall = async () => {
     if (!caller || !stream || !socket) {
-      console.error('❌ Cannot answer call - missing:', { 
+      console.error(' Cannot answer call - missing:', { 
         caller: !!caller, 
         stream: !!stream, 
         socket: !!socket 
@@ -234,25 +216,25 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
       return;
     }
 
-    console.log('✅ Answering call from:', caller.name);
-    console.log('📞 Caller ID:', caller.id);
-    console.log('📞 My ID:', user._id);
+    console.log(' Answering call from:', caller.name);
+    console.log(' Caller ID:', caller.id);
+    console.log(' My ID:', user._id);
     setReceivingCall(false);
 
     peerConnection.current = createPeerConnection();
 
     try {
-      console.log('📄 Received offer:', caller.offer.type);
+      console.log(' Received offer:', caller.offer.type);
       await peerConnection.current.setRemoteDescription(new RTCSessionDescription(caller.offer));
-      console.log('✅ Set remote description');
+      console.log(' Set remote description');
       
       const answer = await peerConnection.current.createAnswer();
-      console.log('📄 Created answer:', answer.type);
+      console.log(' Created answer:', answer.type);
       
       await peerConnection.current.setLocalDescription(answer);
-      console.log('✅ Set local description');
+      console.log(' Set local description');
 
-      console.log('📡 Sending answer to:', caller.id);
+      console.log(' Sending answer to:', caller.id);
       socket.emit('webrtc-answer', {
         to: caller.id,
         answer
@@ -260,15 +242,14 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
 
       setCallAccepted(true);
     } catch (error) {
-      console.error('❌ Error answering call:', error);
+      console.error(' Error answering call:', error);
       alert('Failed to answer call: ' + error.message);
       handleEndCall();
     }
   };
 
-  // End call
   const handleEndCall = () => {
-    console.log('📴 Ending call');
+    console.log(' Ending call');
     
     if (peerConnection.current) {
       peerConnection.current.close();
@@ -286,7 +267,6 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
     onEndCall();
   };
 
-  // Toggle mute
   const toggleMute = () => {
     if (stream) {
       const audioTrack = stream.getAudioTracks()[0];
@@ -295,7 +275,6 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
     }
   };
 
-  // Toggle video
   const toggleVideo = () => {
     if (stream) {
       const videoTrack = stream.getVideoTracks()[0];
@@ -306,7 +285,6 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
     }
   };
 
-  // Auto-call when stream is ready (only if initiating, not receiving)
   useEffect(() => {
     if (stream && receiver && !receivingCall && !incomingCallData) {
       const timer = setTimeout(() => {
@@ -316,7 +294,6 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
     }
   }, [stream]);
 
-  // Auto-answer if incoming call data provided
   useEffect(() => {
     if (stream && incomingCallData && receivingCall) {
       console.log('📲 Auto-answering incoming call');
@@ -336,15 +313,15 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
           ref={userVideo}
           autoPlay
           onLoadedMetadata={(e) => {
-            console.log('📺 Remote video metadata loaded');
+            console.log(' Remote video metadata loaded');
             console.log('   Video dimensions:', e.target.videoWidth, 'x', e.target.videoHeight);
             console.log('   Video ready state:', e.target.readyState);
             e.target.play()
-              .then(() => console.log('✅ Remote video playing'))
-              .catch(err => console.error('❌ Remote play error:', err));
+              .then(() => console.log(' Remote video playing'))
+              .catch(err => console.error(' Remote play error:', err));
           }}
-          onPlay={() => console.log('▶️ Remote video started playing')}
-          onError={(e) => console.error('❌ Remote video error:', e)}
+          onPlay={() => console.log(' Remote video started playing')}
+          onError={(e) => console.error(' Remote video error:', e)}
           className="w-full h-full object-cover bg-gray-800"
         />
 
@@ -355,7 +332,7 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
           ref={myVideo}
           autoPlay
           onLoadedMetadata={(e) => {
-            console.log('📹 Local video metadata loaded');
+            console.log(' Local video metadata loaded');
             e.target.play().catch(err => console.error('Local play error:', err));
           }}
           className="absolute top-4 right-4 w-48 h-36 object-cover rounded-lg border-2 border-white shadow-lg bg-gray-700"

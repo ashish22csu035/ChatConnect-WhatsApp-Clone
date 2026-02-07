@@ -15,9 +15,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (socket) {
-      // Listen for incoming calls
+      
       socket.on('webrtc-offer', ({ from, offer, callerName }) => {
-        console.log('📲 Dashboard: Incoming call from', callerName);
+        console.log(' Dashboard: Incoming call from', callerName);
         setIncomingCall({
           from,
           callerName,
@@ -32,17 +32,16 @@ const Dashboard = () => {
   }, [socket]);
 
   const handleStartVideoCall = (user, video) => {
-    console.log('🎥 Starting call to:', user.name, 'User ID:', user._id);
-    console.log('📞 Video call:', video);
+    console.log(' Starting call to:', user.name, 'User ID:', user._id);
+    console.log(' Video call:', video);
     setSelectedUser(user);
     setIsVideoCall(video);
     setInCall(true);
   };
 
   const handleAcceptCall = () => {
-    console.log('✅ Accepting incoming call');
-    // Find the caller user (we'll need to fetch from users list)
-    // For now, create a temporary user object
+    console.log(' Accepting incoming call');
+    
     setSelectedUser({
       _id: incomingCall.from,
       name: incomingCall.callerName
@@ -53,7 +52,7 @@ const Dashboard = () => {
   };
 
   const handleRejectCall = () => {
-    console.log('❌ Rejecting call');
+    console.log(' Rejecting call');
     if (socket && incomingCall) {
       socket.emit('reject-call', { to: incomingCall.from });
     }

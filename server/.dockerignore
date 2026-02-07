@@ -6,7 +6,7 @@ npm-debug.log
 .git
 .gitignore
 README.md
-*.md
+.md
 tests/
-*.test.js
+test.js
 nodemon.json

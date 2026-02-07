@@ -18,17 +18,16 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      // Connect to socket server
+      
       const newSocket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000', {
         withCredentials: true
       });
 
       setSocket(newSocket);
 
-      // Notify server that user is online
       newSocket.emit('user-online', user._id);
 
-      // Cleanup on unmount
+      
       return () => {
         newSocket.disconnect();
       };
