@@ -17,7 +17,7 @@ const Dashboard = () => {
     if (!socket) return;
 
     const handleIncomingCall = (data) => {
-      console.log("📞 Incoming call:", data);
+      console.log(" Incoming call:", data);
       setIncomingCall({
         from: data.from,
         offer: data.offer,
