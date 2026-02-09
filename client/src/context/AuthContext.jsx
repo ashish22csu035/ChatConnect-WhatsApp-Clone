@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 
 const AuthContext = createContext();
@@ -14,17 +15,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [location.pathname]);
 
   const checkAuth = async () => {
     try {
       const { data } = await authAPI.getCurrentUser();
+      console.log(' User authenticated:', data.name);
       setUser(data);
     } catch (error) {
-      console.log('Not authenticated');
+      console.log(' Not authenticated');
       setUser(null);
     } finally {
       setLoading(false);
@@ -32,8 +35,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = () => {
-    
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   const logout = async () => {
