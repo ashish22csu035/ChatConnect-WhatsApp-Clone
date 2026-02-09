@@ -35,9 +35,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    window.location.href = `${apiUrl}/auth/google`;
-  };
+  const apiUrl = import.meta.env.VITE_API_URL;
+  window.location.href = `${apiUrl}/auth/google`;
+};
+
 
   const logout = async () => {
     try {
