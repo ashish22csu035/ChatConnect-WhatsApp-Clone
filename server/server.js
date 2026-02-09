@@ -39,11 +39,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-here',
   resave: false,
   saveUninitialized: false,
-  proxy: true, // ✅ important for Render
+  proxy: true, 
   cookie: {
-    secure: true,        // ✅ MUST be true on Render (HTTPS)
+    secure: true,        
     httpOnly: true,
-    sameSite: "none",    // ✅ REQUIRED for cross-site (Vercel ↔ Render)
+    sameSite: "none",    
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
