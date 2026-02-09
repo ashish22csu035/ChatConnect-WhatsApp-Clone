@@ -15,6 +15,7 @@ const chatRoutes = require('./routes/chat');
 connectDB();
 
 const app = express();
+app.set("trust proxy", 1);
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -34,14 +35,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(session({
+  name: "chatconnect.sid",
   secret: process.env.SESSION_SECRET || 'your-secret-key-here',
   resave: false,
   saveUninitialized: false,
+  proxy: true, // ✅ important for Render
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 
+    secure: true,        // ✅ MUST be true on Render (HTTPS)
+    httpOnly: true,
+    sameSite: "none",    // ✅ REQUIRED for cross-site (Vercel ↔ Render)
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session());
