@@ -2,28 +2,27 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
 const googleAuthCallback = async (req, res) => {
   try {
     const token = generateToken(req.user._id);
 
-    // Set cookie properly for cross-site (Vercel <-> Render)
+    // ✅ Set cookie for cross-site (Vercel <-> Render)
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,        // MUST be true on HTTPS
-      sameSite: 'none',    // MUST be none for cross-site
+      secure: true,
+      sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60 * 1000,
+      path: '/',
     });
 
-    // Redirect to frontend dashboard
+    // ✅ Redirect to frontend dashboard
     return res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   } catch (error) {
     console.error('Auth callback error:', error);
-    return res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);
+    return res.redirect(`${process.env.CLIENT_URL}/?error=auth_failed`);
   }
 };
 
@@ -41,8 +40,8 @@ const logout = async (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    path: '/',  
     expires: new Date(0),
+    path: '/',
   });
 
   res.json({ message: 'Logged out successfully' });
@@ -51,5 +50,5 @@ const logout = async (req, res) => {
 module.exports = {
   googleAuthCallback,
   getMe,
-  logout,
+  logout
 };
