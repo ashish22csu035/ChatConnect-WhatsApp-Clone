@@ -7,13 +7,16 @@ const router = express.Router();
 
 
 router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+- passport.authenticate('google', { scope: ['profile', 'email'] })
++ passport.authenticate('google', { scope: ['profile', 'email'], session: false })
 );
 
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+- passport.authenticate('google', { failureRedirect: '/login' }),
++ passport.authenticate('google', { failureRedirect: '/login', session: false }),
   googleAuthCallback
 );
+
 
 
 router.get('/me', protect, getMe);
