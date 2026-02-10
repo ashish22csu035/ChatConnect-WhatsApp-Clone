@@ -16,17 +16,18 @@ connectDB();
 
 const app = express();
 app.set("trust proxy", 1);
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true
   }
 });
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
   credentials: true
 }));
 
@@ -36,18 +37,17 @@ app.use(cookieParser());
 
 app.use(session({
   name: "chatconnect.sid",
-  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  proxy: true, 
+  proxy: true,
   cookie: {
-    secure: true,        
+    secure: true,
     httpOnly: true,
-    sameSite: "none",    
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
-
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -69,5 +69,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(` Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

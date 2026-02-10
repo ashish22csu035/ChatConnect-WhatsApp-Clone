@@ -1,56 +1,54 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+};
 
 const googleAuthCallback = async (req, res) => {
   try {
-    
+    const token = generateToken(req.user._id);
 
-    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+    // Set cookie properly for cross-site (Vercel <-> Render)
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,        // MUST be true on HTTPS
+      sameSite: 'none',    // MUST be none for cross-site
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    // Redirect to frontend dashboard
+    return res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   } catch (error) {
     console.error('Auth callback error:', error);
-    res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);
+    return res.redirect(`${process.env.CLIENT_URL}/login?error=auth_failed`);
   }
 };
 
-
 const getMe = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
-
     const user = await User.findById(req.user._id).select('-__v');
     res.json(user);
   } catch (error) {
-    console.error('GetMe error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
 const logout = async (req, res) => {
-  try {
-    if (req.user) {
-      await User.findByIdAndUpdate(req.user._id, {
-        isOnline: false,
-        lastSeen: Date.now()
-      });
-    }
+  res.cookie('token', '', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    expires: new Date(0),
+  });
 
-   
-    req.logout(() => {
-      req.session.destroy(() => {
-        res.clearCookie("chatconnect.sid");
-        res.json({ message: 'Logged out successfully' });
-      });
-    });
-  } catch (error) {
-    console.error('Logout error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+  res.json({ message: 'Logged out successfully' });
 };
 
 module.exports = {
   googleAuthCallback,
   getMe,
-  logout
+  logout,
 };
