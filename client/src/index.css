@@ -16,7 +16,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -34,7 +34,7 @@ body {
   background: #555;
 }
 
-/* Animation for messages */
+
 @keyframes slideIn {
   from {
     opacity: 0;

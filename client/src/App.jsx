@@ -4,7 +4,7 @@ import { SocketProvider } from './context/SocketContext';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
-// Protected Route Component
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
   return user ? children : <Navigate to="/" />;
 };
 
-// Public Route Component (redirects to dashboard if already logged in)
+
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 

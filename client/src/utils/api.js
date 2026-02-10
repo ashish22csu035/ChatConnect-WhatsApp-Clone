@@ -8,7 +8,7 @@ if (!API_URL) {
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // ✅ IMPORTANT for cookies
+  withCredentials: true, // IMPORTANT for cookies
   headers: {
     'Content-Type': 'application/json'
   }
@@ -20,7 +20,7 @@ export const authAPI = {
   logout: () => api.post('/auth/logout')
 };
 
-// Chat API calls ✅ (THIS IS WHAT YOUR BUILD NEEDS)
+// Chat API calls ✅ (THIS NAME MUST MATCH IMPORTS)
 export const chatAPI = {
   getUsers: () => api.get('/chat/users'),
   getMessages: (userId) => api.get(`/chat/messages/${userId}`),
