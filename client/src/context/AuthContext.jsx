@@ -11,9 +11,12 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
+      console.log('🔍 Checking auth...');
       const { data } = await authAPI.getCurrentUser();
+      console.log('✅ Auth success:', data);
       setUser(data);
     } catch (error) {
+      console.error('❌ Auth failed:', error.response?.status, error.response?.data);
       setUser(null);
     } finally {
       setLoading(false);
@@ -29,13 +32,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await authAPI.logout();
-    setUser(null);
-    window.location.href = '/';
+    try {
+      await authAPI.logout();
+      setUser(null);
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout error:', error);
+      window.location.href = '/';
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
