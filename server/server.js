@@ -4,7 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+
 const connectDB = require('./config/db');
 const passport = require('./config/passport');
 const socketHandler = require('./socket/socketHandler');
@@ -35,22 +35,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(session({
-  name: "chatconnect.sid",
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  proxy: true,
-  cookie: {
-    secure: true,
-    httpOnly: true,
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000
-  }
-}));
 
 app.use(passport.initialize());
-app.use(passport.session());
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);

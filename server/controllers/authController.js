@@ -41,6 +41,7 @@ const logout = async (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
+    path: '/',  
     expires: new Date(0),
   });
 
