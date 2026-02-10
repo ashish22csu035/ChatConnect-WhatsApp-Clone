@@ -18,26 +18,18 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const socketURL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
-      console.log('🔌 Connecting to socket:', socketURL);
-      
-      const newSocket = io(socketURL, {
+      // Connect to socket server
+      const newSocket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000', {
         withCredentials: true
       });
 
       setSocket(newSocket);
 
-      newSocket.on('connect', () => {
-        console.log('✅ Socket connected:', newSocket.id);
-        newSocket.emit('user-online', user._id);
-      });
+      // Notify server that user is online
+      newSocket.emit('user-online', user._id);
 
-      newSocket.on('connect_error', (error) => {
-        console.error('❌ Socket connection error:', error);
-      });
-
+      // Cleanup on unmount
       return () => {
-        console.log('🔌 Disconnecting socket');
         newSocket.disconnect();
       };
     }

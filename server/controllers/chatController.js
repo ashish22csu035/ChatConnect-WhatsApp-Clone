@@ -1,7 +1,8 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
 
-
+// @desc    Get all users (for chat list)
+// @route   GET /api/chat/users
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: req.user._id } })
@@ -14,7 +15,8 @@ const getUsers = async (req, res) => {
   }
 };
 
-
+// @desc    Get messages between two users
+// @route   GET /api/chat/messages/:userId
 const getMessages = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -36,7 +38,8 @@ const getMessages = async (req, res) => {
   }
 };
 
-
+// @desc    Send a message
+// @route   POST /api/chat/messages
 const sendMessage = async (req, res) => {
   try {
     const { receiverId, content, messageType } = req.body;
@@ -62,7 +65,8 @@ const sendMessage = async (req, res) => {
   }
 };
 
-
+// @desc    Mark messages as read
+// @route   PUT /api/chat/messages/read/:userId
 const markAsRead = async (req, res) => {
   try {
     const { userId } = req.params;

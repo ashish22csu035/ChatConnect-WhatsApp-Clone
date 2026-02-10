@@ -21,7 +21,7 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
 
   useEffect(() => {
     if (socket && selectedUser) {
-      
+      // Listen for incoming messages
       socket.on('receive-message', (message) => {
         if (message.sender._id === selectedUser._id) {
           setMessages(prev => [...prev, message]);
@@ -29,14 +29,14 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
         }
       });
 
-     
+      // Listen for typing indicator
       socket.on('user-typing', ({ userId, isTyping }) => {
         if (userId === selectedUser._id) {
           setIsTyping(isTyping);
         }
       });
 
-      
+      // Mark messages as read when chat is opened
       chatAPI.markAsRead(selectedUser._id);
     }
 
@@ -71,12 +71,12 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
         senderId: user._id
       });
 
-      
+      // Clear previous timeout
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
 
-      
+      // Stop typing after 2 seconds of inactivity
       typingTimeoutRef.current = setTimeout(() => {
         socket.emit('typing-stop', {
           receiverId: selectedUser._id,
@@ -92,7 +92,7 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
     if (!newMessage.trim() || !selectedUser) return;
 
     try {
-    
+      // Send via socket for real-time delivery
       if (socket) {
         socket.emit('send-message', {
           senderId: user._id,
@@ -102,8 +102,10 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
         });
       }
 
+      // Clear input
       setNewMessage('');
 
+      // Stop typing indicator
       if (socket) {
         socket.emit('typing-stop', {
           receiverId: selectedUser._id,
@@ -111,6 +113,7 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
         });
       }
 
+      // Scroll to bottom
       scrollToBottom();
     } catch (error) {
       console.error('Error sending message:', error);

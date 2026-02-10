@@ -4,11 +4,12 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-
+const session = require('express-session');
 const connectDB = require('./config/db');
 const passport = require('./config/passport');
 const socketHandler = require('./socket/socketHandler');
 
+// Import routes
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 
@@ -16,66 +17,61 @@ const chatRoutes = require('./routes/chat');
 connectDB();
 
 const app = express();
-
-// Trust proxy (important for Render)
-app.set("trust proxy", 1);
-
 const server = http.createServer(app);
 
-// Socket.IO setup
+// Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-    methods: ["GET", "POST"]
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    credentials: true
   }
 });
 
-// CORS middleware - MUST be before other middleware
+// Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie']
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
 }));
 
-// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Cookie parser middleware
 app.use(cookieParser());
 
-// Passport middleware
-app.use(passport.initialize());
+// Session setup for Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 
-// Logging middleware
-app.use((req, res, next) => {
-  console.log(`📨 ${req.method} ${req.path}`);
-  next();
-});
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 
-// Health check
+// Health check route
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Server is running',
-    env: process.env.NODE_ENV,
-    clientURL: process.env.CLIENT_URL
-  });
+  res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Socket handler
+// Socket.io handler
 socketHandler(io);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
 const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Environment: ${process.env.NODE_ENV}`);
-  console.log(`✅ Client URL: ${process.env.CLIENT_URL}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

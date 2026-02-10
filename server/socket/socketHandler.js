@@ -1,21 +1,26 @@
 const User = require('../models/User');
 const Message = require('../models/Message');
 
+// Store active users and their socket connections
 const activeUsers = new Map();
 
 const socketHandler = (io) => {
   io.on('connection', (socket) => {
-    console.log(' User connected:', socket.id);
+    console.log('✅ User connected:', socket.id);
 
+    // User joins with their ID
     socket.on('user-online', async (userId) => {
       try {
+        // Store socket ID for this user
         activeUsers.set(userId, socket.id);
 
+        // Update user status in database
         await User.findByIdAndUpdate(userId, {
           isOnline: true,
           socketId: socket.id
         });
 
+        // Broadcast to all users that this user is online
         io.emit('user-status-change', {
           userId,
           isOnline: true
@@ -27,6 +32,7 @@ const socketHandler = (io) => {
       }
     });
 
+    // Typing indicator
     socket.on('typing-start', (data) => {
       const { receiverId, senderId } = data;
       const receiverSocketId = activeUsers.get(receiverId);
@@ -51,10 +57,12 @@ const socketHandler = (io) => {
       }
     });
 
+    // Send message in real-time
     socket.on('send-message', async (data) => {
       try {
         const { senderId, receiverId, content, messageType } = data;
 
+        // Save message to database
         const message = await Message.create({
           sender: senderId,
           receiver: receiverId,
@@ -66,11 +74,13 @@ const socketHandler = (io) => {
           .populate('sender', 'name profilePicture')
           .populate('receiver', 'name profilePicture');
 
+        // Send to receiver if online
         const receiverSocketId = activeUsers.get(receiverId);
         if (receiverSocketId) {
           io.to(receiverSocketId).emit('receive-message', populatedMessage);
         }
 
+        // Confirm to sender
         socket.emit('message-sent', populatedMessage);
       } catch (error) {
         console.error('Error sending message:', error);
@@ -78,6 +88,7 @@ const socketHandler = (io) => {
       }
     });
 
+    // Simple WebRTC signaling
     socket.on('offer', (data) => {
       const { to, offer, from, name } = data;
       const receiverSocketId = activeUsers.get(to);
@@ -97,14 +108,13 @@ const socketHandler = (io) => {
     });
 
     socket.on('ice-candidate', (data) => {
-  const { to, candidate, from } = data;
-  const targetSocketId = activeUsers.get(to);
-
-  if (targetSocketId) {
-    io.to(targetSocketId).emit('ice-candidate', { candidate, from });
-  }
-});
-
+      const { to, candidate } = data;
+      const targetSocketId = activeUsers.get(to);
+      
+      if (targetSocketId) {
+        io.to(targetSocketId).emit('ice-candidate', { candidate });
+      }
+    });
 
     socket.on('reject-call', (data) => {
       const { to } = data;
@@ -124,9 +134,11 @@ const socketHandler = (io) => {
       }
     });
 
+    // Handle disconnect
     socket.on('disconnect', async () => {
-      console.log(' User disconnected:', socket.id);
+      console.log('❌ User disconnected:', socket.id);
 
+      // Find user by socket ID and update status
       let disconnectedUserId;
       for (let [userId, socketId] of activeUsers.entries()) {
         if (socketId === socket.id) {
@@ -144,6 +156,7 @@ const socketHandler = (io) => {
             socketId: ''
           });
 
+          // Broadcast offline status
           io.emit('user-status-change', {
             userId: disconnectedUserId,
             isOnline: false

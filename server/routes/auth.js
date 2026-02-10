@@ -5,34 +5,25 @@ const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Start Google OAuth
-router.get(
-  '/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email'],
-    session: false
-  })
+// @desc    Initiate Google OAuth
+// @route   GET /api/auth/google
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-// Google OAuth callback
-router.get(
-  '/google/callback',
-  passport.authenticate('google', {
-    session: false,
-    failureRedirect: '/api/auth/failed'
-  }),
+// @desc    Google OAuth callback
+// @route   GET /api/auth/google/callback
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
   googleAuthCallback
 );
 
-// Optional failure route (just for safety/debug)
-router.get('/failed', (req, res) => {
-  res.status(401).json({ message: 'Google authentication failed' });
-});
-
-// Get current user
+// @desc    Get current logged-in user
+// @route   GET /api/auth/me
 router.get('/me', protect, getMe);
 
-// Logout
+// @desc    Logout user
+// @route   POST /api/auth/logout
 router.post('/logout', protect, logout);
 
 module.exports = router;

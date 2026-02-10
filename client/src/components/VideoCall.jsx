@@ -58,6 +58,7 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
       }
     };
 
+    // ✅ Caller
     if (!incomingCallData && receiver) {
       peer
         .createOffer()
@@ -72,6 +73,7 @@ const VideoCall = ({ receiver, isVideoCall, onEndCall, incomingCallData }) => {
         });
     }
 
+    // ✅ Receiver
     if (incomingCallData?.offer) {
       peer
         .setRemoteDescription(new RTCSessionDescription(incomingCallData.offer))

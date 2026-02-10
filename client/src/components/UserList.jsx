@@ -14,7 +14,7 @@ const UserList = ({ selectedUser, onSelectUser }) => {
 
   useEffect(() => {
     if (socket) {
-      
+      // Listen for user status changes
       socket.on('user-status-change', ({ userId, isOnline }) => {
         setUsers(prevUsers =>
           prevUsers.map(user =>

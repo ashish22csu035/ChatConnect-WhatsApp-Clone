@@ -1,62 +1,37 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-if (!API_URL) {
-  console.error("❌ VITE_API_URL is not defined!");
-} else {
-  console.log("✅ API_URL:", API_URL);
-}
-
+// Create axios instance with default config
 const api = axios.create({
   baseURL: API_URL,
+  withCredentials: true, // Important: sends cookies with requests
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// ✅ Add token to every request from localStorage
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log('📤 API Request:', config.method.toUpperCase(), config.url);
-    return config;
-  },
-  (error) => {
-    console.error('❌ Request error:', error);
-    return Promise.reject(error);
-  }
-);
-
-api.interceptors.response.use(
-  (response) => {
-    console.log('📥 API Response:', response.config.url, response.status);
-    return response;
-  },
-  (error) => {
-    console.error('❌ Response error:', error.response?.status, error.response?.data);
-    
-    // ✅ Clear token on 401 errors
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-    }
-    
-    return Promise.reject(error);
-  }
-);
-
+// Auth API calls
 export const authAPI = {
+  // Get current user
   getCurrentUser: () => api.get('/auth/me'),
+  
+  // Logout
   logout: () => api.post('/auth/logout')
 };
 
+// Chat API calls
 export const chatAPI = {
+  // Get all users
   getUsers: () => api.get('/chat/users'),
+  
+  // Get messages with a user
   getMessages: (userId) => api.get(`/chat/messages/${userId}`),
+  
+  // Send message
   sendMessage: (data) => api.post('/chat/messages', data),
+  
+  // Mark messages as read
   markAsRead: (userId) => api.put(`/chat/messages/read/${userId}`)
 };
 
