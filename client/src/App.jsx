@@ -3,7 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-
+import AuthCallback from './components/AuthCallback';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -21,7 +21,6 @@ const ProtectedRoute = ({ children }) => {
 
   return user ? children : <Navigate to="/" />;
 };
-
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -54,6 +53,8 @@ function App() {
                 </PublicRoute>
               }
             />
+            {/* ✅ NEW: Auth callback route */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route
               path="/dashboard"
               element={

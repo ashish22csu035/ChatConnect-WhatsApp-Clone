@@ -10,15 +10,18 @@ if (!API_URL) {
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// Add request interceptor for debugging
+// ✅ Add token to every request from localStorage
 api.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     console.log('📤 API Request:', config.method.toUpperCase(), config.url);
     return config;
   },
@@ -28,7 +31,6 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor for debugging
 api.interceptors.response.use(
   (response) => {
     console.log('📥 API Response:', response.config.url, response.status);
@@ -36,17 +38,21 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('❌ Response error:', error.response?.status, error.response?.data);
+    
+    // ✅ Clear token on 401 errors
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+    }
+    
     return Promise.reject(error);
   }
 );
 
-// Auth API calls
 export const authAPI = {
   getCurrentUser: () => api.get('/auth/me'),
   logout: () => api.post('/auth/logout')
 };
 
-// Chat API calls
 export const chatAPI = {
   getUsers: () => api.get('/chat/users'),
   getMessages: (userId) => api.get(`/chat/messages/${userId}`),

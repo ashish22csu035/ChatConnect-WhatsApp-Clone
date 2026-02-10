@@ -11,12 +11,22 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      console.log('🔍 Checking auth...');
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        console.log('❌ No token in localStorage');
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      console.log('🔍 Checking auth with token...');
       const { data } = await authAPI.getCurrentUser();
       console.log('✅ Auth success:', data);
       setUser(data);
     } catch (error) {
       console.error('❌ Auth failed:', error.response?.status, error.response?.data);
+      localStorage.removeItem('token');
       setUser(null);
     } finally {
       setLoading(false);
@@ -34,10 +44,11 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authAPI.logout();
-      setUser(null);
-      window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('token');
+      setUser(null);
       window.location.href = '/';
     }
   };
