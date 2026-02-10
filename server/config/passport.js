@@ -7,19 +7,16 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback'
+      callbackURL: `${process.env.API_BASE_URL}/api/auth/google/callback`
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
-          // User exists, return user
           return done(null, user);
         }
 
-        // Create new user
         user = await User.create({
           googleId: profile.id,
           email: profile.emails[0].value,
@@ -35,12 +32,11 @@ passport.use(
   )
 );
 
-// Serialize user for session
+// You are NOT using sessions, but keeping these does not break anything
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize user from session
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
