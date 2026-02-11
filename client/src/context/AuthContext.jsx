@@ -33,7 +33,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     // Redirect to Google OAuth
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    window.location.href = 'http://localhost:5000/api/auth/google';
+;
   };
 
   const logout = async () => {
