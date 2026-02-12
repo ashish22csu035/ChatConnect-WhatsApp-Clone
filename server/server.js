@@ -18,12 +18,7 @@ connectDB();
 
 const app = express();
 app.set("trust proxy", 1);
-app.use((req, res, next) => {
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    req.headers['x-forwarded-proto'] = 'https';
-  }
-  next();
-});
+
 
 const server = http.createServer(app);
 
@@ -55,9 +50,11 @@ app.use(session({
   cookie: {
     secure: true,
     sameSite: "None",
-    httpOnly: true
+    httpOnly: true,
+    domain: ".onrender.com"   // 🔥 ADD THIS
   }
 }));
+
 
 
 
