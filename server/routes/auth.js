@@ -8,7 +8,10 @@ const router = express.Router();
 // @desc    Initiate Google OAuth
 // @route   GET /api/auth/google
 router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    session: false  // ✅ Disable sessions since we're using JWT
+  })
 );
 
 // @desc    Google OAuth callback
@@ -17,11 +20,10 @@ router.get(
   '/google/callback',
   passport.authenticate('google', {
     failureRedirect: `${process.env.CLIENT_URL}/login`,
-    session: true
+    session: false  // ✅ Disable sessions
   }),
-  googleAuthCallback   // 🔥 THIS WAS MISSING
+  googleAuthCallback
 );
-
 
 // @desc    Get current logged-in user
 // @route   GET /api/auth/me
