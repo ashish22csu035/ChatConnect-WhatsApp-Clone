@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import AuthSuccess from "./pages/AuthSuccess";
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -63,6 +65,8 @@ function App() {
               }
             />
             <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/auth-success" element={<AuthSuccess />} />
+
           </Routes>
         </SocketProvider>
       </AuthProvider>

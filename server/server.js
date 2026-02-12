@@ -3,7 +3,6 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const passport = require('./config/passport');
 const socketHandler = require('./socket/socketHandler');
@@ -26,13 +25,11 @@ const io = new Server(server, {
 });
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
+  origin: process.env.CLIENT_URL
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use(passport.initialize());
 
