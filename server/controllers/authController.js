@@ -16,12 +16,14 @@ const googleAuthCallback = async (req, res) => {
     const token = generateToken(req.user._id);
 
     // Set token in HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS in production
-     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-    });
+    res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+  maxAge: 30 * 24 * 60 * 60 * 1000
+});
+
 
     // Redirect to frontend
     res.redirect(`${process.env.CLIENT_URL}/dashboard`);
@@ -54,9 +56,13 @@ const logout = async (req, res) => {
 
     // Clear cookie
     res.cookie('token', '', {
-      httpOnly: true,
-      expires: new Date(0)
-    });
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+  expires: new Date(0)
+});
+
 
     res.json({ message: 'Logged out successfully' });
   } catch (error) {

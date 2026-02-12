@@ -18,6 +18,13 @@ connectDB();
 
 const app = express();
 app.set("trust proxy", 1);
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    req.headers['x-forwarded-proto'] = 'https';
+  }
+  next();
+});
+
 const server = http.createServer(app);
 
 // Socket.io setup
@@ -41,14 +48,18 @@ app.use(cookieParser());
 
 // Session setup for Passport
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    secure: true,
+    sameSite: "None",
+    httpOnly: true
   }
 }));
+
+
 
 // Initialize Passport
 app.use(passport.initialize());
