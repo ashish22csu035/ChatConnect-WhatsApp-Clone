@@ -13,10 +13,15 @@ router.get('/google',
 
 // @desc    Google OAuth callback
 // @route   GET /api/auth/google/callback
-router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  googleAuthCallback
+router.get(
+  '/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: `${process.env.CLIENT_URL}/login`,
+    session: true
+  }),
+  googleAuthCallback   // 🔥 THIS WAS MISSING
 );
+
 
 // @desc    Get current logged-in user
 // @route   GET /api/auth/me
