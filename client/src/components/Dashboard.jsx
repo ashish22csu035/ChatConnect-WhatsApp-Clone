@@ -13,12 +13,12 @@ const Dashboard = () => {
   const [incomingCall, setIncomingCall] = useState(null);
   const { socket } = useSocket();
 
-  // ✅ Listen for incoming calls globally
+  
   useEffect(() => {
     if (!socket) return;
 
     const handleIncomingCall = (data) => {
-      console.log("📞 Incoming call:", data);
+      console.log(" Incoming call:", data);
       setIncomingCall({
         from: data.from,
         offer: data.offer,
@@ -44,17 +44,17 @@ const Dashboard = () => {
     };
   }, [socket]);
 
-  /* ================= START CALL ================= */
+  
   const handleStartVideoCall = (user, video) => {
-    console.log("📞 Starting call to:", user.name);
+    console.log(" Starting call to:", user.name);
     setSelectedUser(user);
     setIsVideoCall(video);
     setInCall(true);
   };
 
-  /* ================= ACCEPT CALL ================= */
+  
   const handleAcceptCall = () => {
-    console.log("✅ Accepting call");
+    console.log(" Accepting call");
 
     setSelectedUser({
       _id: incomingCall.from,
@@ -65,16 +65,16 @@ const Dashboard = () => {
     setInCall(true);
   };
 
-  /* ================= REJECT CALL ================= */
+  
   const handleRejectCall = () => {
-    console.log("❌ Rejecting call");
+    console.log(" Rejecting call");
     if (socket && incomingCall) {
       socket.emit("reject-call", { to: incomingCall.from });
     }
     setIncomingCall(null);
   };
 
-  /* ================= END CALL ================= */
+  
   const handleEndCall = () => {
     setInCall(false);
     setIncomingCall(null);
@@ -97,7 +97,7 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Incoming Call UI */}
+      
       {incomingCall && !inCall && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 text-center max-w-md shadow-2xl">
@@ -132,7 +132,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Video Call */}
+      
       {inCall && (
         <VideoCall
           receiver={selectedUser}

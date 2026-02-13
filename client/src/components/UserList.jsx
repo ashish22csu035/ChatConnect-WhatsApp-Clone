@@ -14,7 +14,7 @@ const UserList = ({ selectedUser, onSelectUser }) => {
 
   useEffect(() => {
     if (socket) {
-      // Listen for user status changes
+      
       socket.on('user-status-change', ({ userId, isOnline }) => {
         setUsers(prevUsers =>
           prevUsers.map(user =>
@@ -46,7 +46,7 @@ const UserList = ({ selectedUser, onSelectUser }) => {
 
   return (
     <div className="w-full md:w-80 bg-white border-r border-gray-200 flex flex-col">
-      {/* Search Bar */}
+      
       <div className="p-4 border-b border-gray-200">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -60,7 +60,7 @@ const UserList = ({ selectedUser, onSelectUser }) => {
         </div>
       </div>
 
-      {/* Users List */}
+      
       <div className="flex-1 overflow-y-auto">
         {filteredUsers.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500">
@@ -75,14 +75,14 @@ const UserList = ({ selectedUser, onSelectUser }) => {
                 selectedUser?._id === user._id ? 'bg-light' : ''
               }`}
             >
-              {/* Profile Picture */}
+              
               <div className="relative">
                 <img
                   src={user.profilePicture || 'https://via.placeholder.com/48'}
                   alt={user.name}
                   className="w-12 h-12 rounded-full"
                 />
-                {/* Online Status */}
+                
                 <Circle
                   size={12}
                   className={`absolute bottom-0 right-0 ${
@@ -91,7 +91,7 @@ const UserList = ({ selectedUser, onSelectUser }) => {
                 />
               </div>
 
-              {/* User Info */}
+              
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-800 truncate">{user.name}</p>
                 <p className="text-sm text-gray-500 truncate">

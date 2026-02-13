@@ -12,7 +12,7 @@ const googleAuthCallback = async (req, res) => {
   try {
     const token = generateToken(req.user._id);
 
-    // 🔥 Send token via URL (NO COOKIE)
+    //  Send token via URL (NO COOKIE)
     res.redirect(`${process.env.CLIENT_URL}/auth-success?token=${token}`);
   } catch (error) {
     console.error('Auth callback error:', error);
@@ -20,7 +20,7 @@ const googleAuthCallback = async (req, res) => {
   }
 };
 
-// Get current user
+
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-__v');
@@ -30,7 +30,7 @@ const getMe = async (req, res) => {
   }
 };
 
-// Logout (just frontend token remove karega)
+
 const logout = async (req, res) => {
   res.json({ message: 'Logged out successfully' });
 };

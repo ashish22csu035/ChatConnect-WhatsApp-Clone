@@ -5,32 +5,28 @@ const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// @desc    Initiate Google OAuth
-// @route   GET /api/auth/google
+
 router.get('/google',
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
-    session: false  // ✅ Disable sessions since we're using JWT
+    session: false  
   })
 );
 
-// @desc    Google OAuth callback
-// @route   GET /api/auth/google/callback
+
 router.get(
   '/google/callback',
   passport.authenticate('google', {
     failureRedirect: `${process.env.CLIENT_URL}/login`,
-    session: false  // ✅ Disable sessions
+    session: false  
   }),
   googleAuthCallback
 );
 
-// @desc    Get current logged-in user
-// @route   GET /api/auth/me
+
 router.get('/me', protect, getMe);
 
-// @desc    Logout user
-// @route   POST /api/auth/logout
+
 router.post('/logout', protect, logout);
 
 module.exports = router;

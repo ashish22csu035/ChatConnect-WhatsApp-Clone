@@ -8,7 +8,7 @@ const Navbar = () => {
     <nav className="bg-secondary text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          
           <div className="flex items-center gap-2">
             <div className="bg-primary rounded-full p-2">
               <div className="flex gap-1">
@@ -19,7 +19,7 @@ const Navbar = () => {
             <span className="text-xl font-bold">ChatConnect</span>
           </div>
 
-          {/* User Info */}
+          
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <img
@@ -33,7 +33,7 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Logout Button */}
+            
             <button
               onClick={logout}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"

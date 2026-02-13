@@ -7,7 +7,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary to-dark flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full">
-        {/* Logo */}
+        
         <div className="flex justify-center mb-8">
           <div className="bg-primary rounded-full p-6">
             <div className="flex gap-2">
@@ -17,7 +17,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Title */}
+        
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
           Welcome to ChatConnect
         </h1>
@@ -25,7 +25,7 @@ const Login = () => {
           Connect with friends through chat and video calls
         </p>
 
-        {/* Features */}
+        
         <div className="space-y-4 mb-8">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 rounded-full p-2">
@@ -47,7 +47,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Google Login Button */}
+        
         <button
           onClick={login}
           className="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-3 shadow-md hover:shadow-lg"
@@ -73,7 +73,7 @@ const Login = () => {
           Continue with Google
         </button>
 
-        {/* Footer */}
+        
         <p className="text-center text-gray-500 text-sm mt-6">
           Secure login powered by Google OAuth 2.0
         </p>

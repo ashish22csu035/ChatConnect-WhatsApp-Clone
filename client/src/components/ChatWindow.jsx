@@ -92,7 +92,7 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
     if (!newMessage.trim() || !selectedUser) return;
 
     try {
-      // Send via socket for real-time delivery
+      
       if (socket) {
         socket.emit('send-message', {
           senderId: user._id,
@@ -102,10 +102,10 @@ const ChatWindow = ({ selectedUser, onStartVideoCall }) => {
         });
       }
 
-      // Clear input
+      
       setNewMessage('');
 
-      // Stop typing indicator
+      
       if (socket) {
         socket.emit('typing-stop', {
           receiverId: selectedUser._id,

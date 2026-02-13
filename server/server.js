@@ -24,28 +24,28 @@ const io = new Server(server, {
   }
 });
 
-// ✅ CORS Configuration
+
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }));
 
-// ✅ Body Parsers
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Initialize Passport (NO SESSION NEEDED)
+
 app.use(passport.initialize());
 
-// ✅ Routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 
-// ✅ Socket Handler
+
 socketHandler(io);
 
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(` Server running on port ${PORT}`);
 });
